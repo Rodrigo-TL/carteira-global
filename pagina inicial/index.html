@@ -9,6 +9,32 @@
 <body style="background-color: antiquewhite;">
     <main>
         <h1>CARTEIRA GLOBAL</h1>
+                <!-- INÍCIO DO SEU FORMULÁRIO DE GASTOS -->
+        <section id="cadastro-gasto" style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+            <h2>Adicionar Novo Gasto</h2>
+            <form id="form-gasto">
+                <div style="margin-bottom: 10px;">
+                    <label for="descricao">Descrição: </label>
+                    <input type="text" id="descricao" required placeholder="Ex: Mercado, Assinatura...">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="valor-original">Valor: </label>
+                    <input type="number" id="valor-original" step="0.01" required placeholder="0.00">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label for="moeda-gasto">Moeda Original: </label>
+                    <select id="moeda-gasto" required>
+                        <option value="BRL">Real (BRL)</option>
+                        <option value="USD">Dólar (USD)</option>
+                        <option value="EUR">Euro (EUR)</option>
+                        <option value="BTC">Bitcoin (BTC)</option>
+                    </select>
+                </div>
+                <button type="submit">Inserir Gasto</button>
+            </form>
+        </section>
+        <!-- FIM DO SEU FORMULÁRIO DE GASTOS -->
+
         <h2>Painel de Moedas</h2>
 
         <section id="cotacao">
