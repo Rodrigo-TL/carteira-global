@@ -24,16 +24,19 @@
             <br>
             <br>
             <div>
-                <p>Total de gasto: <input id="total"></input></p>
+                <p>Total de gasto: 
+                    <input type="number" id="total" placeholder="Digite o Valor em R$"></input></p>
             </div>
-            <div>
+            
+            <div> 
                 <p>Equivalente em: </p>
-                <button onclick="dolar">DOLÁR</button> 
-                <button onclick="dolar">EURO</button> 
-                <button onclick="dolar">BITCOIN</button> 
+                <button onclick="dolar()">DOLÁR</button> 
+                <button onclick="euro()">EURO</button> 
+                <button onclick="bitcoin()">BITCOIN</button> 
+                <p>Resultado: <span id="resultado"></span></p>
             </div>
 
-            <script src="script.js"></script>
+            <script src="formulario.js"></script>
         </section>
 
     </main>
