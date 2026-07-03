@@ -1,133 +1,95 @@
-/* ==================== EXTRATO - MELHORIAS ==================== */
+/* Configuração Geral da Página */
+body {
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
+    /* Muda o texto padrão do corpo para branco */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
 
-/* Centralização e estilo do formulário */
-#extract .container {
-    max-width: 650px;
-    margin: 30px auto;
+    /* Imagem de Fundo com uma leve camada escura para destacar o texto */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("images/bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
-#expense-form {
-    max-width: 520px;
-    margin: 0 auto 40px auto;
-    padding: 30px;
-    background: #f8f9fa;
-    border-radius: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-}
-
-#expense-form label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #333;
-}
-
-#expense-form input,
-#expense-form select {
-    width: 100%;
-    padding: 14px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    font-size: 1.05rem;
+/* Título Principal no topo */
+h1 {
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    /* Sombra para destacar no fundo */
     margin-bottom: 20px;
-    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
-#expense-form input:focus,
-#expense-form select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.15);
-}
-
-#expense-form button {
+/* Estilização dos Blocos/Containers (Formulário e Painel) */
+section,
+#extract .container {
+    background-color: rgba(255, 255, 255, 0.85);
+    /* Fundo branco com 85% de opacidade */
+    backdrop-filter: blur(5px);
+    /* Efeito de vidro fosco moderno */
+    color: #2c3e50;
+    /* Texto interno escuro para dar contraste */
     width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    font-size: 1.15rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: all 0.3s;
-}
-
-#expense-form button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.4);
-}
-
-/* Tabela do Histórico */
-#expenses-table {
-    width: 100%;
-    margin-top: 30px;
-    border-collapse: collapse;
-    background: white;
-}
-
-#expenses-table th,
-#expenses-table td {
-    padding: 14px 10px;
-    text-align: left;
-    border-bottom: 1px solid #eee;
-}
-
-#expenses-table th {
-    background: #f1f3f5;
-    color: #444;
-    font-weight: 600;
-}
-
-#expenses-table tr:hover {
-    background: #f8f9fa;
-}
-
-/* Responsividade da Tabela */
-@media (max-width: 768px) {
-    #expenses-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-    
-    #expenses-table thead {
-        display: none; /* Esconde o cabeçalho em telas muito pequenas */
-    }
-    
-    #expenses-table tr {
-        display: block;
-        margin-bottom: 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 10px;
-    }
-    
-    #expenses-table td {
-        display: block;
-        text-align: right;
-        position: relative;
-        padding-left: 50%;
-    }
-    
-    #expenses-table td::before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        font-weight: bold;
-        color: #007bff;
-    }
-}
-
-/* Totais */
-.totals {
-    margin-top: 30px;
+    max-width: 500px;
+    margin: 15px auto;
     padding: 25px;
-    background: linear-gradient(135deg, #e9f7ef, #d4edda);
     border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Ajuste dos títulos soltos na página a ficarem brancos */
+h2 {
+    color: #abaeb3 !important;
+    margin-top: 20px;
+    margin-bottom: 15px;
     text-align: center;
-    font-size: 1.4rem;
+}
+
+
+h3 {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    margin-top: 25px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Inputs e Selects mais modernos */
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+/* Botões com visual limpo e moderno */
+button,
+input[type="submit"] {
+    background-color: #3182ce;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
     font-weight: bold;
-    color: #28a745;
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.15);
+    width: 100%;
+    transition: background 0.2s;
+}
+
+button:hover,
+input[type="submit"]:hover {
+    background-color: #2b6cb0;
 }

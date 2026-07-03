@@ -1,16 +1,20 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carteira Global</title>
-    <link rel="stylesheet" href="./arquivo.css">
+    <link rel="stylesheet" href="arquivo.css">
+
 </head>
-<body style="background-color: antiquewhite;">
+
+<body>
     <main>
         <h1>CARTEIRA GLOBAL</h1>
-            <!-- INÍCIO DO SEU FORMULÁRIO DE GASTOS -->
- <section id="cadastro-gasto" style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
+        <!-- INÍCIO DO SEU FORMULÁRIO DE GASTOS -->
+        <section id="cadastro-gasto"
+            style="margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 5px;">
             <h2>Adicionar Novo Gasto</h2>
             <form id="form-gasto">
                 <div style="margin-bottom: 10px;">
@@ -38,28 +42,34 @@
 
         <h2>Painel de Moedas</h2>
 
+
         <section id="cotacao">
             <div class="moeda">
                 <p>USD: <input id="valor-usd"></input></p>
             </div>
+
             <div class="moeda">
                 <p>EUR: <input id="valor-eur"></input></p>
             </div>
             <div class="moeda">
                 <p>BTC: <input id="valor-btc"></input></p>
             </div>
-            <br>
-            <br>
+
             <div>
-                <p>Total de gasto: 
-                    <input type="number" id="total" placeholder="Digite o Valor em R$"></input></p>
+                <p>Total de gasto:
+                    <input type="number" id="total" placeholder="Digite o Valor em R$"></input>
+                </p>
             </div>
-            
-            <div> 
+
+            <div>
                 <p>Equivalente em: </p>
-                <button onclick="dolar()">DOLÁR</button> 
-                <button onclick="euro()">EURO</button> 
-                <button onclick="bitcoin()">BITCOIN</button> 
+                <button onclick="dolar()">DOLÁR</button>
+                <br>
+                <br>
+                <button onclick="euro()">EURO</button>
+                <br>
+                <br>
+                <button onclick="bitcoin()">BITCOIN</button>
                 <p>Resultado: <span id="resultado"></span></p>
             </div>
 
@@ -68,5 +78,5 @@
 
     </main>
 </body>
-</html>
 
+</html>
