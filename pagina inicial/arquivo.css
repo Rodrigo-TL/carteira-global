@@ -1,97 +1,103 @@
-/* Configuração Geral da Página */
+:root {
+    color-scheme: dark;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
+    padding: 20px 16px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #ffffff;
-    /* Muda o texto padrão do corpo para branco */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     min-height: 100vh;
-
-    /* Imagem de Fundo com uma leve camada escura para destacar o texto */
-    background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("images/bg.jpg");
+    background-image: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url("images/bg.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
 }
 
-/* Título Principal no topo */
+.app-shell {
+    width: min(100%, 620px);
+    margin: 0 auto;
+    display: grid;
+    gap: 18px;
+}
+
+h1,
+h2 {
+    margin: 0 0 12px;
+    text-align: center;
+}
+
 h1 {
     color: #ffffff;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-    /* Sombra para destacar no fundo */
-    margin-bottom: 20px;
     text-transform: uppercase;
     letter-spacing: 2px;
+    font-size: clamp(1.6rem, 4vw, 2.3rem);
 }
 
-/* Estilização dos Blocos/Containers (Formulário e Painel) */
-section,
-#extract .container {
-    background-color: rgba(255, 255, 255, 0.85);
-    /* Fundo branco com 85% de opacidade */
-    backdrop-filter: blur(5px);
-    /* Efeito de vidro fosco moderno */
-    color: #2c3e50;
-    /* Texto interno escuro para dar contraste */
-    width: 100%;
-    max-width: 500px;
-    margin: 15px auto;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-/* Ajuste dos títulos soltos na página a ficarem brancos */
 h2 {
-    color: #abaeb3 !important;
-    margin-top: 20px;
-    margin-bottom: 15px;
-    text-align: center;
+    color: #4a5568;
 }
 
-
-h3 {
-    color: #ffffff !important;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
-    margin-top: 25px;
-    margin-bottom: 10px;
-    text-align: center;
+.card {
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(6px);
+    color: #2c3e50;
+    width: 100%;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
 }
 
-/* Inputs e Selects mais modernos */
+.form-grid,
+.converter-box {
+    display: grid;
+    gap: 12px;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+label {
+    font-weight: 600;
+    color: #2d3748;
+}
+
 input,
 select {
     width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    margin-bottom: 15px;
+    padding: 11px 12px;
     border: 1px solid #cbd5e1;
-    border-radius: 6px;
+    border-radius: 8px;
     box-sizing: border-box;
+    font-size: 1rem;
 }
 
-/* Botões com visual limpo e moderno */
 button,
 input[type="submit"] {
     background-color: #3182ce;
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 6px;
+    padding: 12px 16px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     width: 100%;
-    transition: background 0.2s;
+    transition: background 0.2s ease, transform 0.2s ease;
 }
 
 button:hover,
 input[type="submit"]:hover {
     background-color: #2b6cb0;
+    transform: translateY(-1px);
 }
 
 .cotacao-header {
@@ -99,7 +105,7 @@ input[type="submit"]:hover {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .status-cotacao {
@@ -143,10 +149,29 @@ input[type="submit"]:hover {
     flex-shrink: 0;
 }
 
+.moeda-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.moeda {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.moeda label {
+    display: block;
+    margin-bottom: 6px;
+}
+
 .valor-cotacao {
     text-align: center;
     font-weight: 600;
     background-color: #f8fafc;
+    margin-bottom: 0;
     transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -158,6 +183,24 @@ input[type="submit"]:hover {
     border-color: #e2e8f0;
 }
 
+.summary-box {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.resultado-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0;
+}
+
 #cotacao.loaded .valor-cotacao {
     animation: fadeIn 0.45s ease;
 }
@@ -165,6 +208,45 @@ input[type="submit"]:hover {
 button:disabled {
     opacity: 0.7;
     cursor: wait;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 16px 12px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .cotacao-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-atualizar {
+        width: 100%;
+    }
+
+    .button-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .card {
+        padding: 14px;
+    }
+
+    input,
+    select,
+    button {
+        font-size: 16px;
+    }
 }
 
 @keyframes spin {

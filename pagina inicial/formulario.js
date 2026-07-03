@@ -4,7 +4,11 @@ const campoBtc = document.getElementById("valor-btc");
 const statusCotacao = document.getElementById("status-cotacao");
 const botaoAtualizar = document.getElementById("btn-atualizar-cotacoes");
 
-let cotacaoDolar = null;
+let cotacoes = {
+    USD: null,
+    EUR: null,
+    BTC: null
+};
 
 function setLoadingState(isLoading) {
     const camposCotacao = document.querySelectorAll(".valor-cotacao");
@@ -57,107 +61,99 @@ function carregarCotacoes() {
 
     fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL")
         .then(function(resposta) {
+            if (!resposta.ok) {
+                throw new Error("Erro ao buscar cotação");
+            }
             return resposta.json();
         })
-        .then(function(dados){
-            document.getElementById("valor-usd").value = dados.USDBRL.bid
-            document.getElementById("valor-eur").value = dados.EURBRL.bid
-            document.getElementById("valor-btc").value = dados.BTCBRL.bid
-           
+        .then(function(dados) {
+            cotacoes.USD = Number(dados.USDBRL.bid);
+            cotacoes.EUR = Number(dados.EURBRL.bid);
+            cotacoes.BTC = Number(dados.BTCBRL.bid);
+
+            campoUsd.value = cotacoes.USD.toFixed(2);
+            campoEur.value = cotacoes.EUR.toFixed(2);
+            campoBtc.value = cotacoes.BTC.toFixed(2);
+            setLoadingState(false);
         })
-            
-        
         .catch(function() {
             setLoadingState(false);
             alert("Erro ao buscar cotação.");
-        })
-
-//Buscando a cotação
-let cotacaoDolar;
-    fetch(`https://economia.awesomeapi.com.br/json/last/USD-BRL`)
-        .then(function(resposta){
-            return resposta.json();
-        })
-        .then(function(dados){
-            cotacaoDolar = Number(dados.USDBRL.bid);
-            document.getElementById("valor-usd").innerText = cotacaoDolar;
-        })
-
-        .catch(function(){
-            alert("Erro ao buscar cotação");
-        });
-//Criando a funcionalidade do botão de converter o valor em dolar
-function dolar(){
-    let total =
-        document.getElementById("total").value;
-
-    let resultado =
-        Number(total) / cotacaoDolar;
-
-    document.getElementById("resultado").innerText =
-        resultado.toLocaleString("en-US", {
-            style: "currency", 
-            currency: "USD"
         });
 }
 
-function euro(){
-    let total =
-        document.getElementById("total").value;
+function converterParaMoeda(chaveCotacao, locale, currency) {
+    const total = Number(document.getElementById("total").value);
+    const resultadoElemento = document.getElementById("resultado");
 
-    let resultado =
-        Number(total) / cotacaoEuro;
+    if (!Number.isFinite(total) || total <= 0) {
+        resultadoElemento.textContent = "Informe um valor válido";
+        return;
+    }
 
-    document.getElementById("resultado").innerText =
-        resultado.toLocaleString("de-DE", {
-            style: "currency", 
-            currency: "EUR"
+    const cotacao = cotacoes[chaveCotacao];
+
+    if (!cotacao) {
+        resultadoElemento.textContent = "Cotação indisponível";
+        return;
+    }
+
+    const resultado = total / cotacao;
+
+    if (chaveCotacao === "BTC") {
+        resultadoElemento.textContent = `${resultado.toFixed(2)} BTC`;
+    } else {
+        resultadoElemento.textContent = resultado.toLocaleString(locale, {
+            style: "currency",
+            currency: currency
         });
+    }
 }
 
-function bitcoin(){
-    let total =
-        document.getElementById("total").value;
-
-    let resultado =
-        Number(total) / cotacaoBitcoin;
-
-    document.getElementById("resultado").innerText =
-        resultado.toFixed(2);
+function dolar() {
+    converterParaMoeda("USD", "en-US", "USD");
 }
 
+function euro() {
+    converterParaMoeda("EUR", "de-DE", "EUR");
+}
+
+function bitcoin() {
+    converterParaMoeda("BTC", "en-US", "BTC");
+}
+
+botaoAtualizar.addEventListener("click", carregarCotacoes);
 
 // Captura o envio do formulário de novos gastos
 document.getElementById("form-gasto").addEventListener("submit", function(event) {
     event.preventDefault();
 
-    // Obtém os dados inseridos pelo usuário
-    const descricao = document.getElementById("descricao").value;
     const valorOriginal = parseFloat(document.getElementById("valor-original").value);
     const moedaSelecionada = document.getElementById("moeda-gasto").value;
-    
-    let valorConvertidoBRL = valorOriginal;
 
-    // Converte o valor para Real usando as cotações carregadas na tela pela API
-    if (moedaSelecionada === "USD") {
-        const cotacaoUSD = parseFloat(document.getElementById("valor-usd").value);
-        valorConvertidoBRL = valorOriginal * cotacaoUSD;
-    } else if (moedaSelecionada === "EUR") {
-        const cotacaoEUR = parseFloat(document.getElementById("valor-eur").value);
-        valorConvertidoBRL = valorOriginal * cotacaoEUR;
-    } else if (moedaSelecionada === "BTC") {
-        const cotacaoBTC = parseFloat(document.getElementById("valor-btc").value);
-        valorConvertidoBRL = valorOriginal * cotacaoBTC;
+    if (!Number.isFinite(valorOriginal) || valorOriginal <= 0) {
+        alert("Informe um valor válido para o gasto.");
+        return;
     }
 
-    // Soma o novo valor convertido ao total acumulado no campo de gastos
-    let campoTotal = document.getElementById("total");
-    let totalAtual = parseFloat(campoTotal.value) || 0;
-    let novoTotal = totalAtual + valorConvertidoBRL;
+    let valorConvertidoBRL = valorOriginal;
 
-    // Atualiza o valor exibido na tela e limpa o formulário
+    if (moedaSelecionada === "USD") {
+        valorConvertidoBRL = valorOriginal * cotacoes.USD;
+    } else if (moedaSelecionada === "EUR") {
+        valorConvertidoBRL = valorOriginal * cotacoes.EUR;
+    } else if (moedaSelecionada === "BTC") {
+        valorConvertidoBRL = valorOriginal * cotacoes.BTC;
+    }
+
+    const campoTotal = document.getElementById("total");
+    const totalAtual = parseFloat(campoTotal.value) || 0;
+    const novoTotal = totalAtual + valorConvertidoBRL;
+
     campoTotal.value = novoTotal.toFixed(2);
     document.getElementById("form-gasto").reset();
-    
+
     alert(`Gasto de R$ ${valorConvertidoBRL.toFixed(2)} adicionado ao total!`);
 });
+
+carregarCotacoes();
