@@ -6,7 +6,14 @@ fetch(`https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL`)
             document.getElementById("valor-usd").value = dados.USDBRL.bid
             document.getElementById("valor-eur").value = dados.EURBRL.bid
             document.getElementById("valor-btc").value = dados.BTCBRL.bid
-           
+
+            //Buscando a cotação
+            cotacaoDolar = Number(dados.USDBRL.bid);
+            document.getElementById("valor-usd").innerText = cotacaoDolar;
+            cotacaoEuro = Number(dados.EURBRL.bid);
+            document.getElementById("valor-usd").innerText = cotacaoEuro;
+            cotacaoBitcoin = Number(dados.BTCBRL.bid);
+            document.getElementById("valor-usd").innerText = cotacaoBitcoin;
         })
             
         
@@ -14,21 +21,8 @@ fetch(`https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL`)
             alert("Erro ao buscar cotação.");
         })
 
-//Buscando a cotação
-let cotacaoDolar;
-    fetch(`https://economia.awesomeapi.com.br/json/last/USD-BRL`)
-        .then(function(resposta){
-            return resposta.json();
-        })
-        .then(function(dados){
-            cotacaoDolar = Number(dados.USDBRL.bid);
-            document.getElementById("valor-usd").innerText = cotacaoDolar;
-        })
 
-        .catch(function(){
-            alert("Erro ao buscar cotação");
-        });
-//Criando a funcionalidade do botão de converter o valor em dolar
+//Criando a funcionalidade do botão de converter o valor em dolar/euro/bitcoin
 function dolar(){
     let total =
         document.getElementById("total").value;
@@ -37,8 +31,38 @@ function dolar(){
         Number(total) / cotacaoDolar;
 
     document.getElementById("resultado").innerText =
+        resultado.toLocaleString("en-US", {
+            style: "currency", 
+            currency: "USD"
+        });
+}
+
+function euro(){
+    let total =
+        document.getElementById("total").value;
+
+    let resultado =
+        Number(total) / cotacaoEuro;
+
+    document.getElementById("resultado").innerText =
+        resultado.toLocaleString("de-DE", {
+            style: "currency", 
+            currency: "EUR"
+        });
+}
+
+function bitcoin(){
+    let total =
+        document.getElementById("total").value;
+
+    let resultado =
+        Number(total) / cotacaoBitcoin;
+
+    document.getElementById("resultado").innerText =
         resultado.toFixed(2);
 }
+
+
 // Captura o envio do formulário de novos gastos
 document.getElementById("form-gasto").addEventListener("submit", function(event) {
     event.preventDefault();
