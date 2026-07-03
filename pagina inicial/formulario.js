@@ -1,33 +1,97 @@
-fetch(`https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL`)
-        .then(function(resposta){
-            return resposta.json();
-        })
-        .then(function(dados){
-            document.getElementById("valor-usd").value = dados.USDBRL.bid
-            document.getElementById("valor-eur").value = dados.EURBRL.bid
-            document.getElementById("valor-btc").value = dados.BTCBRL.bid
-           
-        })
-            
-        
-        .catch(function() {
-            alert("Erro ao buscar cotação.");
-        })
+const campoUsd = document.getElementById("valor-usd");
+const campoEur = document.getElementById("valor-eur");
+const campoBtc = document.getElementById("valor-btc");
+const statusCotacao = document.getElementById("status-cotacao");
+const botaoAtualizar = document.getElementById("btn-atualizar-cotacoes");
 
-//Buscando a cotação
-let cotacaoDolar;
-    fetch(`https://economia.awesomeapi.com.br/json/last/USD-BRL`)
-        .then(function(resposta){
+let cotacaoDolar = null;
+
+function setLoadingState(isLoading) {
+    const camposCotacao = document.querySelectorAll(".valor-cotacao");
+    const botoesCotacao = document.querySelectorAll("#cotacao button");
+    const secaoCotacao = document.getElementById("cotacao");
+
+    if (isLoading) {
+        botaoAtualizar.textContent = "Atualizando...";
+    } else {
+        botaoAtualizar.textContent = "Atualizar";
+    }
+
+    camposCotacao.forEach(function(campo) {
+        campo.classList.toggle("loading", isLoading);
+        if (isLoading) {
+            campo.value = "";
+        }
+        campo.readOnly = isLoading;
+    });
+
+    botoesCotacao.forEach(function(botao) {
+        botao.disabled = isLoading;
+    });
+
+    secaoCotacao.classList.remove("loaded");
+
+    if (isLoading) {
+        statusCotacao.classList.remove("success");
+        statusCotacao.innerHTML = '<span class="spinner"></span><span>Buscando cotações...</span>';
+    } else {
+        exibirEstadoSucesso();
+    }
+}
+
+function exibirEstadoSucesso() {
+    botaoAtualizar.textContent = "Atualizar";
+    statusCotacao.classList.add("success");
+    statusCotacao.innerHTML = '<span class="spinner" style="display: none;"></span><span>Cotações atualizadas</span>';
+
+    document.getElementById("cotacao").classList.add("loaded");
+
+    document.querySelectorAll(".valor-cotacao").forEach(function(campo) {
+        campo.classList.remove("loading");
+        campo.readOnly = false;
+    });
+}
+
+function carregarCotacoes() {
+    setLoadingState(true);
+
+    fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL")
+        .then(function(resposta) {
             return resposta.json();
         })
-        .then(function(dados){
+        .then(function(dados) {
+            campoUsd.value = dados.USDBRL.bid;
+            campoEur.value = dados.EURBRL.bid;
+            campoBtc.value = dados.BTCBRL.bid;
             cotacaoDolar = Number(dados.USDBRL.bid);
-            document.getElementById("valor-usd").innerText = cotacaoDolar;
+            document.getElementById("cotacao").classList.add("loaded");
+            setLoadingState(false);
         })
-
-        .catch(function(){
-            alert("Erro ao buscar cotação");
+        .catch(function() {
+            setLoadingState(false);
+            alert("Erro ao buscar cotação.");
         });
+}
+
+botaoAtualizar.addEventListener("click", function() {
+    carregarCotacoes();
+});
+
+function carregarCotacoesIniciais() {
+    const camposCotacao = document.querySelectorAll(".valor-cotacao");
+    camposCotacao.forEach(function(campo) {
+        campo.classList.remove("loading");
+        campo.readOnly = true;
+    });
+
+    statusCotacao.classList.remove("success");
+    statusCotacao.innerHTML = '<span class="spinner" style="display: none;"></span><span>Atualize as cotações quando quiser</span>';
+
+    document.getElementById("cotacao").classList.remove("loaded");
+}
+
+carregarCotacoesIniciais();
+
 //Criando a funcionalidade do botão de converter o valor em dolar
 function dolar(){
     let total =

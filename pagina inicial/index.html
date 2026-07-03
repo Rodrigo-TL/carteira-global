@@ -44,15 +44,23 @@
 
 
         <section id="cotacao">
-            <div class="moeda">
-                <p>USD: <input id="valor-usd"></input></p>
+            <div class="cotacao-header">
+                <div id="status-cotacao" class="status-cotacao" aria-live="polite">
+                    <span class="spinner"></span>
+                    <span>Buscando cotações...</span>
+                </div>
+                <button id="btn-atualizar-cotacoes" type="button" class="btn-atualizar">Atualizar</button>
             </div>
 
             <div class="moeda">
-                <p>EUR: <input id="valor-eur"></input></p>
+                <p>USD: <input id="valor-usd" class="valor-cotacao" value="Carregando..." readonly></p>
+            </div>
+
+            <div class="moeda">
+                <p>EUR: <input id="valor-eur" class="valor-cotacao" value="Carregando..." readonly></p>
             </div>
             <div class="moeda">
-                <p>BTC: <input id="valor-btc"></input></p>
+                <p>BTC: <input id="valor-btc" class="valor-cotacao" value="Carregando..." readonly></p>
             </div>
 
             <div>
