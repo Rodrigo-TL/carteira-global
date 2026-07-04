@@ -2,27 +2,38 @@
 <html lang="pt-BR">
 
 <head>
+   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carteira Global</title>
+    
+    <!-- Vinculação do arquivo de estilos CSS externo do projeto -->
     <link rel="stylesheet" href="arquivo.css">
 </head>
 
 <body>
+   
     <main class="app-shell">
         <h1>Carteira Global</h1>
 
+        <!-- SEÇÃO 1: Formulário de Cadastro para Inclusão de Novos Gastos -->
         <section id="cadastro-gasto" class="card">
             <h2>Adicionar Novo Gasto</h2>
             <form id="form-gasto" class="form-grid">
+                
+                <!-- Campo de digitação para a descrição ou nome da despesa -->
                 <div class="field-group">
                     <label for="descricao">Descrição</label>
                     <input type="text" id="descricao" required placeholder="Ex: Mercado, assinatura...">
                 </div>
+                
+                <!-- Campo numérico para inserir o valor original da despesa -->
                 <div class="field-group">
                     <label for="valor-original">Valor</label>
                     <input type="number" id="valor-original" step="0.01" required placeholder="0.00">
                 </div>
+                
+                <!-- Menu de seleção para escolher a moeda de origem do gasto -->
                 <div class="field-group">
                     <label for="moeda-gasto">Moeda Original</label>
                     <select id="moeda-gasto" required>
@@ -32,20 +43,51 @@
                         <option value="BTC">Bitcoin (BTC)</option>
                     </select>
                 </div>
+                
+                <!-- Botão para submeter o formulário e acionar o evento do JavaScript -->
                 <button type="submit">Inserir Gasto</button>
             </form>
         </section>
 
+        <!-- SEÇÃO 2: Tabela Histórica que Exibe os Gastos Carregados e Salvos no localStorage -->
+        <section id="historico-gastos" class="card" style="margin-bottom: 20px;">
+            <h2>Gastos Cadastrados</h2>
+            <!-- Div com rolagem horizontal automática caso a tabela fique maior que telas pequenas -->
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <!-- Cabeçalho descritivo das colunas da tabela -->
+                        <tr style="border-bottom: 2px solid #ccc;">
+                            <th style="padding: 8px;">Descrição</th>
+                            <th style="padding: 8px;">Valor Original</th>
+                            <th style="padding: 8px;">Moeda</th>
+                            <th style="padding: 8px;">Valor (R$)</th>
+                            <th style="padding: 8px;">Ação</th>
+                        </tr>
+                    </thead>
+                    <!-- Corpo da tabela onde o JavaScript irá injetar as linhas dinamicamente (Operação de Carregar) -->
+                    <tbody id="tabela-gastos-corpo">
+                        <!-- Os dados do localStorage e os botões de Excluir serão inseridos aqui via DOM -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: Painel de Controle de Cotações da API e Conversores Monetários -->
         <section id="cotacao" class="card">
             <h2>Painel de Cotações</h2>
+            
+            <!-- Cabeçalho do painel com indicador visual de status e gatilho de atualização manual -->
             <div class="cotacao-header">
-                <div id="status-cotacao" class="status-cotacao" aria-live="polite">
+                <!-- Removido o aria-live mantendo estritamente a estrutura original dos colaboradores -->
+                <div id="status-cotacao" class="status-cotacao">
                     <span class="spinner"></span>
                     <span>Buscando cotações...</span>
                 </div>
                 <button id="btn-atualizar-cotacoes" type="button" class="btn-atualizar">Atualizar</button>
             </div>
 
+            <!-- Grade contendo os inputs somente-leitura que mostram as taxas da API em tempo real -->
             <div class="moeda-grid">
                 <div class="moeda">
                     <label for="valor-usd">USD</label>
@@ -61,23 +103,28 @@
                 </div>
             </div>
 
+            <!-- Caixa de resumo que exibe a somatória automática de todas as despesas em Reais (BRL) -->
             <div class="summary-box">
                 <label for="total">Total de gasto (R$)</label>
                 <input type="number" id="total" step="0.01" placeholder="Digite o valor em R$">
             </div>
 
+            <!-- Painel interativo de conversão do total geral para moedas estrangeiras -->
             <div class="converter-box">
                 <p>Equivalente em:</p>
                 <div class="button-grid">
+                    <!-- Botões vinculados às funções originais de conversão do JavaScript -->
                     <button type="button" onclick="dolar()">Dólar</button>
                     <button type="button" onclick="euro()">Euro</button>
                     <button type="button" onclick="bitcoin()">Bitcoin</button>
                 </div>
+                <!-- Local onde o resultado formatado da conversão será exibido na tela -->
                 <p class="resultado-label">Resultado: <span id="resultado">—</span></p>
             </div>
         </section>
     </main>
 
+    <!-- Vinculação do script JavaScript contendo as regras de negócio da aplicação -->
     <script src="formulario.js"></script>
 </body>
 
