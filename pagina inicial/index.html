@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 
 <head>
-   
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carteira Global</title>
     
-    <!-- Vinculação do arquivo de estilos CSS externo do projeto -->
+    
     <link rel="stylesheet" href="arquivo.css">
 </head>
 
@@ -25,6 +25,18 @@
                 <div class="field-group">
                     <label for="descricao">Descrição</label>
                     <input type="text" id="descricao" required placeholder="Ex: Mercado, assinatura...">
+                </div>
+
+                <!-- NOVO: Campo de seleção para a categoria do gasto -->
+                <div class="field-group">
+                    <label for="categoria-gasto">Categoria</label>
+                    <select id="categoria-gasto" required>
+                        <option value="Alimentação">Alimentação</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Lazer">Lazer</option>
+                        <option value="Moradia">Moradia</option>
+                        <option value="Outros">Outros</option>
+                    </select>
                 </div>
                 
                 <!-- Campo numérico para inserir o valor original da despesa -->
@@ -44,7 +56,7 @@
                     </select>
                 </div>
                 
-                <!-- Botão para submeter o formulário e acionar o evento do JavaScript -->
+                <!-- Botão de disparo para submeter o formulário e acionar o evento do JavaScript -->
                 <button type="submit">Inserir Gasto</button>
             </form>
         </section>
@@ -52,20 +64,35 @@
         <!-- SEÇÃO 2: Tabela Histórica que Exibe os Gastos Carregados e Salvos no localStorage -->
         <section id="historico-gastos" class="card" style="margin-bottom: 20px;">
             <h2>Gastos Cadastrados</h2>
+            
+            <!-- NOVO: Filtro por categoria para a listagem histórica -->
+            <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                <label for="filtro-categoria" style="font-weight: bold;">Filtrar por Categoria:</label>
+                <select id="filtro-categoria" style="padding: 6px; border-radius: 4px;">
+                    <option value="Todos">Mostrar Todos</option>
+                    <option value="Alimentação">Alimentação</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Lazer">Lazer</option>
+                    <option value="Moradia">Moradia</option>
+                    <option value="Outros">Outros</option>
+                </select>
+            </div>
+
             <!-- Div com rolagem horizontal automática caso a tabela fique maior que telas pequenas -->
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left;">
                     <thead>
-                        <!-- Cabeçalho descritivo das colunas da tabela -->
+                        <!-- Cabeçalho descritivo das colunas da tabela incluindo a nova coluna Categoria -->
                         <tr style="border-bottom: 2px solid #ccc;">
                             <th style="padding: 8px;">Descrição</th>
+                            <th style="padding: 8px;">Categoria</th>
                             <th style="padding: 8px;">Valor Original</th>
                             <th style="padding: 8px;">Moeda</th>
                             <th style="padding: 8px;">Valor (R$)</th>
                             <th style="padding: 8px;">Ação</th>
                         </tr>
                     </thead>
-                    <!-- Corpo da tabela onde o JavaScript irá injetar as linhas dinamicamente (Operação de Carregar) -->
+                    
                     <tbody id="tabela-gastos-corpo">
                         <!-- Os dados do localStorage e os botões de Excluir serão inseridos aqui via DOM -->
                     </tbody>
@@ -79,7 +106,6 @@
             
             <!-- Cabeçalho do painel com indicador visual de status e gatilho de atualização manual -->
             <div class="cotacao-header">
-                <!-- Removido o aria-live mantendo estritamente a estrutura original dos colaboradores -->
                 <div id="status-cotacao" class="status-cotacao">
                     <span class="spinner"></span>
                     <span>Buscando cotações...</span>
