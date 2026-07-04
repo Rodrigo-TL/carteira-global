@@ -1,40 +1,47 @@
+// Seleção dos elementos para exibição dos valores das cotações
 const campoUsd = document.getElementById("valor-usd");
 const campoEur = document.getElementById("valor-eur");
 const campoBtc = document.getElementById("valor-btc");
 const statusCotacao = document.getElementById("status-cotacao");
 const botaoAtualizar = document.getElementById("btn-atualizar-cotacoes");
 
+// Objeto global que armazena os valores numéricos das cotações obtidas pela API
 let cotacoes = {
     USD: null,
     EUR: null,
     BTC: null
 };
 
+// Controla visualmente o estado de carregamento da tela durante a busca das cotações
 function setLoadingState(isLoading) {
     const camposCotacao = document.querySelectorAll(".valor-cotacao");
     const botoesCotacao = document.querySelectorAll("#cotacao button");
     const secaoCotacao = document.getElementById("cotacao");
 
+    // Altera o texto do botão de atualização conforme o status
     if (isLoading) {
         botaoAtualizar.textContent = "Atualizando...";
     } else {
         botaoAtualizar.textContent = "Atualizar";
     }
 
+    // Ativa ou desativa o estilo visual de carregamento nos inputs de cotação
     camposCotacao.forEach(function(campo) {
         campo.classList.toggle("loading", isLoading);
         if (isLoading) {
-            campo.value = "";
+            campo.value = ""; // Limpa os valores enquanto busca
         }
-        campo.readOnly = isLoading;
+        campo.readOnly = isLoading; // Bloqueia a edição durante a busca
     });
 
+    // Desabilita temporariamente os botões de conversão enquanto carrega as taxas
     botoesCotacao.forEach(function(botao) {
         botao.disabled = isLoading;
     });
 
     secaoCotacao.classList.remove("loaded");
 
+    // Atualiza a barra de status com o ícone de spinner animado ou com a mensagem de sucesso
     if (isLoading) {
         statusCotacao.classList.remove("success");
         statusCotacao.innerHTML = '<span class="spinner"></span><span>Buscando cotações...</span>';
@@ -43,6 +50,7 @@ function setLoadingState(isLoading) {
     }
 }
 
+// Aplica as classes e estilos visuais de sucesso assim que a API responde corretamente
 function exibirEstadoSucesso() {
     botaoAtualizar.textContent = "Atualizar";
     statusCotacao.classList.add("success");
@@ -56,10 +64,11 @@ function exibirEstadoSucesso() {
     });
 }
 
+// Realiza a requisição assíncrona (Fetch API) para buscar as cotações monetárias atualizadas
 function carregarCotacoes() {
-    setLoadingState(true);
+    setLoadingState(true); // Ativa o feedback visual de carregamento
 
-    fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL")
+    fetch("https://awesomeapi.com.br")
         .then(function(resposta) {
             if (!resposta.ok) {
                 throw new Error("Erro ao buscar cotação");
@@ -67,14 +76,16 @@ function carregarCotacoes() {
             return resposta.json();
         })
         .then(function(dados) {
+            // Guarda os valores estritamente em formato numérico no objeto global
             cotacoes.USD = Number(dados.USDBRL.bid);
             cotacoes.EUR = Number(dados.EURBRL.bid);
             cotacoes.BTC = Number(dados.BTCBRL.bid);
 
+            // Alimenta os inputs da tela formatando as casas decimais das moedas
             campoUsd.value = cotacoes.USD.toFixed(2);
             campoEur.value = cotacoes.EUR.toFixed(2);
             campoBtc.value = cotacoes.BTC.toFixed(2);
-            setLoadingState(false);
+            setLoadingState(false); // Remove o estado de carregamento
         })
         .catch(function() {
             setLoadingState(false);
@@ -82,10 +93,12 @@ function carregarCotacoes() {
         });
 }
 
+// Função genérica de conversão: divide o total em R$ pela taxa da moeda selecionada
 function converterParaMoeda(chaveCotacao, locale, currency) {
     const total = Number(document.getElementById("total").value);
     const resultadoElemento = document.getElementById("resultado");
 
+    // Valida se o valor total acumulado inserido no input é numérico e maior que zero
     if (!Number.isFinite(total) || total <= 0) {
         resultadoElemento.textContent = "Informe um valor válido";
         return;
@@ -93,6 +106,7 @@ function converterParaMoeda(chaveCotacao, locale, currency) {
 
     const cotacao = cotacoes[chaveCotacao];
 
+    // Verifica se os valores da API já foram carregados com sucesso
     if (!cotacao) {
         resultadoElemento.textContent = "Cotação indisponível";
         return;
@@ -100,6 +114,7 @@ function converterParaMoeda(chaveCotacao, locale, currency) {
 
     const resultado = total / cotacao;
 
+    // Formata a exibição do texto final com a sigla ou com o símbolo monetário padrão
     if (chaveCotacao === "BTC") {
         resultadoElemento.textContent = `${resultado.toFixed(2)} BTC`;
     } else {
@@ -110,6 +125,7 @@ function converterParaMoeda(chaveCotacao, locale, currency) {
     }
 }
 
+// Gatilhos de clique que direcionam a moeda e as regras de formatação locais para a conversão
 function dolar() {
     converterParaMoeda("USD", "en-US", "USD");
 }
@@ -122,12 +138,62 @@ function bitcoin() {
     converterParaMoeda("BTC", "en-US", "BTC");
 }
 
+// Vincula o evento de clique do botão "Atualizar" para refazer a requisição da API
 botaoAtualizar.addEventListener("click", carregarCotacoes);
 
-// Captura o envio do formulário de novos gastos
-document.getElementById("form-gasto").addEventListener("submit", function(event) {
-    event.preventDefault();
 
+// ---IMPLEMENTAÇÃO DO LOCALSTORAGE (SALVAR, CARREGAR, EXCLUIR) ---
+
+// FUNÇÃO DE CARREGAR: Resgata a string do localStorage, converte de volta para array ou inicia vazia
+let listaGastos = JSON.parse(localStorage.getItem("gastos_carteira")) || [];
+
+// FUNÇÃO DE RENDERIZAR: Percorre o array de memória, gera a tabela dinamicamente e atualiza o total acumulado
+function renderizarGastos() {
+    const tabelaCorpo = document.getElementById("tabela-gastos-corpo");
+    tabelaCorpo.innerHTML = ""; // Limpa a tabela antes de redesenhar para evitar duplicações
+
+    let totalGeralBRL = 0; // Acumulador matemático das despesas convertidas
+
+    // Mapeia item por item injetando uma nova linha de registro com estrutura HTML na tabela
+    listaGastos.forEach(function(gasto, index) {
+        totalGeralBRL += parseFloat(gasto.valorBRL);
+
+        const linha = document.createElement("tr");
+        linha.style.borderBottom = "1px solid #eee";
+        linha.innerHTML = `
+            <td style="padding: 8px;">${gasto.descricao}</td>
+            <td style="padding: 8px;">${parseFloat(gasto.valorOriginal).toFixed(2)}</td>
+            <td style="padding: 8px;">${gasto.moeda}</td>
+            <td style="padding: 8px;">R$ ${parseFloat(gasto.valorBRL).toFixed(2)}</td>
+            <td style="padding: 8px;">
+                <!-- O botão repassa a posição index do array de memória para sabermos qual registro apagar -->
+                <button type="button" onclick="excluirGasto(${index})" style="background:#dc3545; color:white; border:none; padding:4px 8px; cursor:pointer; border-radius:3px;">Excluir</button>
+            </td>
+        `;
+        tabelaCorpo.appendChild(linha);
+    });
+
+    // Sincroniza dinamicamente o valor total acumulado no campo de texto de gastos em Reais
+    document.getElementById("total").value = totalGeralBRL.toFixed(2);
+}
+
+// FUNÇÃO DE EXCLUIR: Deleta o item selecionado da lista, atualiza o localStorage e limpa a interface gráfica
+function excluirGasto(index) {
+    if (confirm("Tem certeza que deseja remover este gasto?")) {
+        listaGastos.splice(index, 1); // Remove tecnicamente o objeto da posição informada
+        
+        // SALVA: Guarda a lista com o item reduzido de volta no armazenamento local do navegador
+        localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos));
+        
+        renderizarGastos(); // Redesenha a interface atualizando a tabela e o total da carteira
+    }
+}
+
+// Captura e valida o envio de novos dados no formulário, realizando a conversão e o armazenamento
+document.getElementById("form-gasto").addEventListener("submit", function(event) {
+    event.preventDefault(); // Impede o envio padrão do formulário que recarregaria a página
+
+    const descricao = document.getElementById("descricao").value;
     const valorOriginal = parseFloat(document.getElementById("valor-original").value);
     const moedaSelecionada = document.getElementById("moeda-gasto").value;
 
@@ -138,6 +204,7 @@ document.getElementById("form-gasto").addEventListener("submit", function(event)
 
     let valorConvertidoBRL = valorOriginal;
 
+    // Faz o cálculo multiplicando o valor digitado pelas taxas carregadas pelo bloco de APIs do grupo
     if (moedaSelecionada === "USD") {
         valorConvertidoBRL = valorOriginal * cotacoes.USD;
     } else if (moedaSelecionada === "EUR") {
@@ -146,14 +213,23 @@ document.getElementById("form-gasto").addEventListener("submit", function(event)
         valorConvertidoBRL = valorOriginal * cotacoes.BTC;
     }
 
-    const campoTotal = document.getElementById("total");
-    const totalAtual = parseFloat(campoTotal.value) || 0;
-    const novoTotal = totalAtual + valorConvertidoBRL;
+    // Estrutura o objeto literal contendo as propriedades unificadas do novo registro de despesa
+    const novoGasto = {
+        descricao: descricao,
+        valorOriginal: valorOriginal,
+        moeda: moedaSelecionada,
+        valorBRL: valorConvertidoBRL
+    };
 
-    campoTotal.value = novoTotal.toFixed(2);
-    document.getElementById("form-gasto").reset();
+    // SALVA: Insere o novo objeto na lista de memória e atualiza a chave correspondente no localStorage
+    listaGastos.push(novoGasto);
+    localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos));
 
-    alert(`Gasto de R$ ${valorConvertidoBRL.toFixed(2)} adicionado ao total!`);
+    renderizarGastos(); // Atualiza em tempo real as tabelas e campos de exibição de valores
+    document.getElementById("form-gasto").reset(); // Limpa as caixas de digitação do formulário
+    alert(`Gasto de R$ ${valorConvertidoBRL.toFixed(2)} adicionado e salvo!`);
 });
 
+// Execuções Iniciais automáticas: dispara a requisição das moedas e reconstrói o histórico do localStorage
 carregarCotacoes();
+renderizarGastos();
