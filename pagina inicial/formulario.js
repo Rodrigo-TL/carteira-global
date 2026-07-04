@@ -233,3 +233,10 @@ document.getElementById("form-gasto").addEventListener("submit", function(event)
         moeda: moedaSelecionada,
         valorBRL: valorConvertidoBRL
     };
+
+    listaGastos.push(novoGasto); // Adiciona o novo gasto ao array
+    localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos)); // Persiste no localStorage
+
+    document.getElementById("form-gasto").reset(); // Limpa os inputs do formulário
+    renderizarGastos(); // Redesenha a tabela com o novo item adicionado
+});
