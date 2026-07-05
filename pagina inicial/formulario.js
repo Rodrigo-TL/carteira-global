@@ -231,3 +231,43 @@ document.getElementById("form-gasto").addEventListener("submit", function(event)
     const descricao = document.getElementById("descricao").value;
     const categoria = document.getElementById("categoria-gasto").value;
     const valorOriginal = parseFloat(document.getElementById("valor-original").value);
+    const moedaSelecionada = document.getElementById("moeda-gasto").value;
+
+    // Validação de segurança para garantir que o valor inserido é válido
+    if (!Number.isFinite(valorOriginal) || valorOriginal <= 0) {
+        alert("Informe um valor válido para o gasto.");
+        return;
+    }
+
+    let valorConvertidoBRL = valorOriginal;
+
+    // Faz o cálculo multiplicando o valor digitado pelas taxas carregadas pelo bloco de APIs do grupo
+    if (moedaSelecionada === "USD") {
+        valorConvertidoBRL = valorOriginal * cotacoes.USD;
+    } else if (moedaSelecionada === "EUR") {
+        valorConvertidoBRL = valorOriginal * cotacoes.EUR;
+    } else if (moedaSelecionada === "BTC") {
+        valorConvertidoBRL = valorOriginal * cotacoes.BTC;
+    }
+
+    // Estrutura o objeto literal contendo todas as propriedades incluindo a categoria
+    const novoGasto = {
+        descricao: descricao,
+        categoria: categoria,
+        valorOriginal: valorOriginal,
+        moeda: moedaSelecionada,
+        valorBRL: valorConvertidoBRL
+    };
+
+    // SALVA: Adiciona o novo objeto na lista de memória e atualiza a chave correspondente no localStorage
+    listaGastos.push(novoGasto);
+    localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos));
+
+    renderizarGastos(); // Atualiza em tempo real as tabelas e painel de estatísticas por categorias
+    document.getElementById("form-gasto").reset(); // Limpa as caixas de digitação do formulário
+    alert(`Gasto de R$ ${valorConvertidoBRL.toFixed(2)} adicionado e salvo!`);
+});
+
+// Execuções Iniciais automáticas: dispara a requisição das moedas e reconstrói o histórico do localStorage
+carregarCotacoes();
+renderizarGastos();
