@@ -27,7 +27,7 @@
                     <input type="text" id="descricao" required placeholder="Ex: Mercado, assinatura...">
                 </div>
 
-                <!-- NOVO: Campo de seleção para a categoria do gasto -->
+                <!-- Campo de seleção para a categoria do gasto -->
                 <div class="field-group">
                     <label for="categoria-gasto">Categoria</label>
                     <select id="categoria-gasto" required>
@@ -45,7 +45,7 @@
                     <input type="number" id="valor-original" step="0.01" required placeholder="0.00">
                 </div>
                 
-                <!-- Menu de seleção para escolher a moeda de origem do gasto -->
+                <!-- Menu de seleção (Dropdown) para escolher a moeda de origem do gasto -->
                 <div class="field-group">
                     <label for="moeda-gasto">Moeda Original</label>
                     <select id="moeda-gasto" required>
@@ -56,7 +56,7 @@
                     </select>
                 </div>
                 
-                <!-- Botão de disparo para submeter o formulário e acionar o evento do JavaScript -->
+                <!-- Botão para submeter o formulário e acionar o evento do JavaScript -->
                 <button type="submit">Inserir Gasto</button>
             </form>
         </section>
@@ -65,7 +65,7 @@
         <section id="historico-gastos" class="card" style="margin-bottom: 20px;">
             <h2>Gastos Cadastrados</h2>
             
-            <!-- NOVO: Filtro por categoria para a listagem histórica -->
+            <!-- Filtro por categoria para a listagem histórica -->
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
                 <label for="filtro-categoria" style="font-weight: bold;">Filtrar por Categoria:</label>
                 <select id="filtro-categoria" style="padding: 6px; border-radius: 4px;">
@@ -92,7 +92,7 @@
                             <th style="padding: 8px;">Ação</th>
                         </tr>
                     </thead>
-                    
+                    <!-- Corpo da tabela onde o JavaScript irá injetar as linhas dinamicamente -->
                     <tbody id="tabela-gastos-corpo">
                         <!-- Os dados do localStorage e os botões de Excluir serão inseridos aqui via DOM -->
                     </tbody>
@@ -100,11 +100,37 @@
             </div>
         </section>
 
+        <!-- NOVO: SEÇÃO 2B: Estatísticas e Painel de Gastos por Categoria -->
+        <section id="estatisticas-gastos" class="card" style="margin-bottom: 20px;">
+            <h2>Estatísticas por Categoria</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 15px;">
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #28a745; text-align: center;">
+                    <span style="font-size: 0.85em; color: #666; font-weight: bold; display: block; margin-bottom: 5px;">Alimentação</span>
+                    <strong style="font-size: 1.1em; color: #333;">R$ <span id="estat-alimentacao">0.00</span></strong>
+                </div>
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #007bff; text-align: center;">
+                    <span style="font-size: 0.85em; color: #666; font-weight: bold; display: block; margin-bottom: 5px;">Transporte</span>
+                    <strong style="font-size: 1.1em; color: #333;">R$ <span id="estat-transporte">0.00</span></strong>
+                </div>
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #ffc107; text-align: center;">
+                    <span style="font-size: 0.85em; color: #666; font-weight: bold; display: block; margin-bottom: 5px;">Lazer</span>
+                    <strong style="font-size: 1.1em; color: #333;">R$ <span id="estat-lazer">0.00</span></strong>
+                </div>
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #dc3545; text-align: center;">
+                    <span style="font-size: 0.85em; color: #666; font-weight: bold; display: block; margin-bottom: 5px;">Moradia</span>
+                    <strong style="font-size: 1.1em; color: #333;">R$ <span id="estat-moradia">0.00</span></strong>
+                </div>
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 4px solid #6c757d; text-align: center;">
+                    <span style="font-size: 0.85em; color: #666; font-weight: bold; display: block; margin-bottom: 5px;">Outros</span>
+                    <strong style="font-size: 1.1em; color: #333;">R$ <span id="estat-outros">0.00</span></strong>
+                </div>
+            </div>
+        </section>
+
         <!-- SEÇÃO 3: Painel de Controle de Cotações da API e Conversores Monetários -->
         <section id="cotacao" class="card">
             <h2>Painel de Cotações</h2>
             
-            <!-- Cabeçalho do painel com indicador visual de status e gatilho de atualização manual -->
             <div class="cotacao-header">
                 <div id="status-cotacao" class="status-cotacao">
                     <span class="spinner"></span>
@@ -113,7 +139,6 @@
                 <button id="btn-atualizar-cotacoes" type="button" class="btn-atualizar">Atualizar</button>
             </div>
 
-            <!-- Grade contendo os inputs somente-leitura que mostram as taxas da API em tempo real -->
             <div class="moeda-grid">
                 <div class="moeda">
                     <label for="valor-usd">USD</label>
@@ -129,22 +154,18 @@
                 </div>
             </div>
 
-            <!-- Caixa de resumo que exibe a somatória automática de todas as despesas em Reais (BRL) -->
             <div class="summary-box">
                 <label for="total">Total de gasto (R$)</label>
                 <input type="number" id="total" step="0.01" placeholder="Digite o valor em R$">
             </div>
 
-            <!-- Painel interativo de conversão do total geral para moedas estrangeiras -->
             <div class="converter-box">
                 <p>Equivalente em:</p>
                 <div class="button-grid">
-                    <!-- Botões vinculados às funções originais de conversão do JavaScript -->
                     <button type="button" onclick="dolar()">Dólar</button>
                     <button type="button" onclick="euro()">Euro</button>
                     <button type="button" onclick="bitcoin()">Bitcoin</button>
                 </div>
-                <!-- Local onde o resultado formatado da conversão será exibido na tela -->
                 <p class="resultado-label">Resultado: <span id="resultado">—</span></p>
             </div>
         </section>
