@@ -93,69 +93,19 @@ function carregarCotacoes() {
         });
 }
 
-// Função genérica de conversão: divide o total em R$ pela taxa da moeda selecionada
-function converterParaMoeda(chaveCotacao, locale, currency) {
-    const total = Number(document.getElementById("total").value);
-    const resultadoElemento = document.getElementById("resultado");
-
-    // Valida se o valor total acumulado inserido no input é numérico e maior que zero
-    if (!Number.isFinite(total) || total <= 0) {
-        resultadoElemento.textContent = "Informe um valor válido";
-        return;
-    }
-
-    const cotacao = cotacoes[chaveCotacao];
-
-    // Verifica se os valores da API já foram carregados com sucesso
-    if (!cotacao) {
-        resultadoElemento.textContent = "Cotação indisponível";
-        return;
-    }
-
-    const resultado = total / cotacao;
-
-    // Formata a exibição do texto final com a sigla ou com o símbolo monetário padrão
-    if (chaveCotacao === "BTC") {
-        resultadoElemento.textContent = `${resultado.toFixed(2)} BTC`;
-    } else {
-        resultadoElemento.textContent = resultado.toLocaleString(locale, {
-            style: "currency",
-            currency: currency
-        });
-    }
-}
-
-// Gatilhos de clique que direcionam a moeda e as regras de formatação locais para a conversão
-function dolar() {
-    converterParaMoeda("USD", "en-US", "USD");
-}
-
-function euro() {
-    converterParaMoeda("EUR", "de-DE", "EUR");
-}
-
-function bitcoin() {
-    converterParaMoeda("BTC", "en-US", "BTC");
-}
-
 // Vincula o evento de clique do botão "Atualizar" para refazer a requisição da API
 botaoAtualizar.addEventListener("click", carregarCotacoes);
-
+window.addEventListener("DOMContentLoaded", carregarCotacoes);
 
 // --- LOCALSTORAGE, FILTRO E ESTATÍSTICAS POR CATEGORIA ---
-
-// FUNÇÃO DE CARREGAR: Resgata a string do localStorage, converte de volta para array ou inicia vazia
 let listaGastos = JSON.parse(localStorage.getItem("gastos_carteira")) || [];
 
-// FUNÇÃO DE RENDERIZAR: Filtra e percorre os elementos, calcula estatísticas e monta a tabela histórica
 function renderizarGastos() {
     const tabelaCorpo = document.getElementById("tabela-gastos-corpo");
     const filtroSelecionado = document.getElementById("filtro-categoria").value;
-    tabelaCorpo.innerHTML = ""; // Limpa a tabela antes de redesenhar para evitar duplicações
+    tabelaCorpo.innerHTML = "";
 
-    let totalGeralBRL = 0; // Acumulador do total filtrado em exibição
-
-    // Objeto temporário para calcular o total absoluto de gastos acumulados por categoria
+    let totalGeralBRL = 0;
     let acumuladorCategorias = {
         "Alimentação": 0,
         "Transporte": 0,
@@ -164,19 +114,16 @@ function renderizarGastos() {
         "Outros": 0
     };
 
-    // Mapeia a lista original para alimentar as estatísticas globais e estruturar as linhas da tabela
     listaGastos.forEach(function(gasto, index) {
         const valorBRL = parseFloat(gasto.valorBRL);
         const cat = gasto.categoria || "Outros";
 
-        // Soma ao total da categoria correspondente (Estatística estrutural)
         if (acumuladorCategorias.hasOwnProperty(cat)) {
             acumuladorCategorias[cat] += valorBRL;
         } else {
             acumuladorCategorias["Outros"] += valorBRL;
         }
-        
-        // Se houver um filtro ativo diferente de "Todos", oculta as linhas que não batem com a seleção
+       
         if (filtroSelecionado !== "Todos" && cat !== filtroSelecionado) {
             return;
         }
@@ -198,76 +145,12 @@ function renderizarGastos() {
         tabelaCorpo.appendChild(linha);
     });
 
-    // Injeta os valores calculados diretamente nos blocos visuais de estatísticas na tela
     document.getElementById("estat-alimentacao").textContent = acumuladorCategorias["Alimentação"].toFixed(2);
     document.getElementById("estat-transporte").textContent = acumuladorCategorias["Transporte"].toFixed(2);
     document.getElementById("estat-lazer").textContent = acumuladorCategorias["Lazer"].toFixed(2);
     document.getElementById("estat-moradia").textContent = acumuladorCategorias["Moradia"].toFixed(2);
     document.getElementById("estat-outros").textContent = acumuladorCategorias["Outros"].toFixed(2);
-
-    // Sincroniza dinamicamente o valor total acumulado no campo de texto principal em Reais
-    document.getElementById("total").value = totalGeralBRL.toFixed(2);
 }
 
-// FUNÇÃO DE EXCLUIR: Deleta o item selecionado da lista, atualiza o localStorage e limpa a interface gráfica
-function excluirGasto(index) {
-    if (confirm("Tem certeza que deseja remover este gasto?")) {
-        listaGastos.splice(index, 1); // Remove tecnicamente o objeto da posição informada
-        
-        // SALVA: Guarda a lista com o item reduzido de volta no armazenamento local do navegador
-        localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos));
-        
-        renderizarGastos(); // Redesenha a interface atualizando a tabela, estatísticas e totais
-    }
-}
-
-// Ouvinte de evento para escutar as mudanças do select de filtro e redesenhar a tabela dinamicamente
 document.getElementById("filtro-categoria").addEventListener("change", renderizarGastos);
-
-// Captura e valida o envio de novos dados no formulário, realizando a conversão e o armazenamento
-document.getElementById("form-gasto").addEventListener("submit", function(event) {
-    event.preventDefault(); // Impede o envio padrão do formulário que recarregaria a página
-
-    const descricao = document.getElementById("descricao").value;
-    const categoria = document.getElementById("categoria-gasto").value;
-    const valorOriginal = parseFloat(document.getElementById("valor-original").value);
-    const moedaSelecionada = document.getElementById("moeda-gasto").value;
-
-    // Validação de segurança para garantir que o valor inserido é válido
-    if (!Number.isFinite(valorOriginal) || valorOriginal <= 0) {
-        alert("Informe um valor válido para o gasto.");
-        return;
-    }
-
-    let valorConvertidoBRL = valorOriginal;
-
-    // Faz o cálculo multiplicando o valor digitado pelas taxas carregadas pelo bloco de APIs do grupo
-    if (moedaSelecionada === "USD") {
-        valorConvertidoBRL = valorOriginal * cotacoes.USD;
-    } else if (moedaSelecionada === "EUR") {
-        valorConvertidoBRL = valorOriginal * cotacoes.EUR;
-    } else if (moedaSelecionada === "BTC") {
-        valorConvertidoBRL = valorOriginal * cotacoes.BTC;
-    }
-
-    // Estrutura o objeto literal contendo todas as propriedades incluindo a categoria
-    const novoGasto = {
-        descricao: descricao,
-        categoria: categoria,
-        valorOriginal: valorOriginal,
-        moeda: moedaSelecionada,
-        valorBRL: valorConvertidoBRL
-    };
-
-    // SALVA: Adiciona o novo objeto na lista de memória e atualiza a chave correspondente no localStorage
-    listaGastos.push(novoGasto);
-    localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos));
-
-    renderizarGastos(); // Atualiza em tempo real as tabelas e painel de estatísticas por categorias
-    document.getElementById("form-gasto").reset(); // Limpa as caixas de digitação do formulário
-    alert(`Gasto de R$ ${valorConvertidoBRL.toFixed(2)} adicionado e salvo!`);
-});
-
-// Execuções Iniciais automáticas: dispara a requisição das moedas e reconstrói o histórico do localStorage
-carregarCotacoes();
-renderizarGastos();
+window.addEventListener("DOMContentLoaded", renderizarGastos);
