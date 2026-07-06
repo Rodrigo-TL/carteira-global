@@ -2,12 +2,12 @@
 <html lang="pt-BR">
 
 <head>
-    
+   
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carteira Global</title>
-    
-    
+   
+   
     <link rel="stylesheet" href="arquivo.css">
 </head>
 
@@ -20,7 +20,7 @@
         <section id="cadastro-gasto" class="card">
             <h2>Adicionar Novo Gasto</h2>
             <form id="form-gasto" class="form-grid">
-                
+               
                 <!-- Campo de digitação para a descrição ou nome da despesa -->
                 <div class="field-group">
                     <label for="descricao">Descrição</label>
@@ -38,13 +38,13 @@
                         <option value="Outros">Outros</option>
                     </select>
                 </div>
-                
+               
                 <!-- Campo numérico para inserir o valor original da despesa -->
                 <div class="field-group">
                     <label for="valor-original">Valor</label>
                     <input type="number" id="valor-original" step="0.01" required placeholder="0.00">
                 </div>
-                
+               
                 <!-- Menu de seleção (Dropdown) para escolher a moeda de origem do gasto -->
                 <div class="field-group">
                     <label for="moeda-gasto">Moeda Original</label>
@@ -55,7 +55,7 @@
                         <option value="BTC">Bitcoin (BTC)</option>
                     </select>
                 </div>
-                
+               
                 <!-- Botão para submeter o formulário e acionar o evento do JavaScript -->
                 <button type="submit">Inserir Gasto</button>
             </form>
@@ -64,7 +64,7 @@
         <!-- SEÇÃO 2: Tabela Histórica que Exibe os Gastos Carregados e Salvos no localStorage -->
         <section id="historico-gastos" class="card" style="margin-bottom: 20px;">
             <h2>Gastos Cadastrados</h2>
-            
+           
             <!-- Filtro por categoria para a listagem histórica -->
             <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
                 <label for="filtro-categoria" style="font-weight: bold;">Filtrar por Categoria:</label>
@@ -127,10 +127,10 @@
             </div>
         </section>
 
-        <!-- SEÇÃO 3: Painel de Controle de Cotações da API e Conversores Monetários -->
+        <!-- SEÇÃO 3: Painel de Controle de Cotações da API -->
         <section id="cotacao" class="card">
             <h2>Painel de Cotações</h2>
-            
+           
             <div class="cotacao-header">
                 <div id="status-cotacao" class="status-cotacao">
                     <span class="spinner"></span>
@@ -153,26 +153,7 @@
                     <input id="valor-btc" class="valor-cotacao" value="Carregando..." readonly>
                 </div>
             </div>
-
-            <div class="summary-box">
-                <label for="total">Total de gasto (R$)</label>
-                <input type="number" id="total" step="0.01" placeholder="Digite o valor em R$">
-            </div>
-
-            <div class="converter-box">
-                <p>Equivalente em:</p>
-                <div class="button-grid">
-                    <button type="button" onclick="dolar()">Dólar</button>
-                    <button type="button" onclick="euro()">Euro</button>
-                    <button type="button" onclick="bitcoin()">Bitcoin</button>
-                </div>
-                <p class="resultado-label">Resultado: <span id="resultado">—</span></p>
-            </div>
         </section>
     </main>
-
-    <!-- Vinculação do script JavaScript contendo as regras de negócio da aplicação -->
-    <script src="formulario.js"></script>
 </body>
-
 </html>
