@@ -170,7 +170,7 @@ input[type="submit"]:hover {
 .valor-cotacao {
     text-align: center;
     font-weight: 600;
-    background-color: #f8fafc;
+    background-color: #393d3f;
     margin-bottom: 0;
     transition: opacity 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
