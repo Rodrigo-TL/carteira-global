@@ -142,46 +142,70 @@ function bitcoin() {
 botaoAtualizar.addEventListener("click", carregarCotacoes);
 
 
-// ---IMPLEMENTAÇÃO DO LOCALSTORAGE COM FILTRO POR CATEGORIA ---
+// --- LOCALSTORAGE, FILTRO E ESTATÍSTICAS POR CATEGORIA ---
 
 // FUNÇÃO DE CARREGAR: Resgata a string do localStorage, converte de volta para array ou inicia vazia
 let listaGastos = JSON.parse(localStorage.getItem("gastos_carteira")) || [];
 
-// FUNÇÃO DE RENDERIZAR: Filtra e percorre os elementos criando as linhas e recalculando o total exibido
+// FUNÇÃO DE RENDERIZAR: Filtra e percorre os elementos, calcula estatísticas e monta a tabela histórica
 function renderizarGastos() {
     const tabelaCorpo = document.getElementById("tabela-gastos-corpo");
     const filtroSelecionado = document.getElementById("filtro-categoria").value;
     tabelaCorpo.innerHTML = ""; // Limpa a tabela antes de redesenhar para evitar duplicações
 
-    let totalGeralBRL = 0; // Acumulador matemático das despesas convertidas
+    let totalGeralBRL = 0; // Acumulador do total filtrado em exibição
 
-    // Mapeia item por item da lista original avaliando o filtro e injetando as linhas HTML
+    // Objeto temporário para calcular o total absoluto de gastos acumulados por categoria
+    let acumuladorCategorias = {
+        "Alimentação": 0,
+        "Transporte": 0,
+        "Lazer": 0,
+        "Moradia": 0,
+        "Outros": 0
+    };
+
+    // Mapeia a lista original para alimentar as estatísticas globais e estruturar as linhas da tabela
     listaGastos.forEach(function(gasto, index) {
+        const valorBRL = parseFloat(gasto.valorBRL);
+        const cat = gasto.categoria || "Outros";
+
+        // Soma ao total da categoria correspondente (Estatística estrutural)
+        if (acumuladorCategorias.hasOwnProperty(cat)) {
+            acumuladorCategorias[cat] += valorBRL;
+        } else {
+            acumuladorCategorias["Outros"] += valorBRL;
+        }
         
-        // Se houver um filtro selecionado diferente de "Todos", ignora as categorias que não batem
-        if (filtroSelecionado !== "Todos" && gasto.categoria !== filtroSelecionado) {
+        // Se houver um filtro ativo diferente de "Todos", oculta as linhas que não batem com a seleção
+        if (filtroSelecionado !== "Todos" && cat !== filtroSelecionado) {
             return;
         }
 
-        totalGeralBRL += parseFloat(gasto.valorBRL);
+        totalGeralBRL += valorBRL;
 
         const linha = document.createElement("tr");
         linha.style.borderBottom = "1px solid #eee";
         linha.innerHTML = `
             <td style="padding: 8px;">${gasto.descricao}</td>
-            <td style="padding: 8px;"><span style="background: #e0e0e0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">${gasto.categoria || 'Outros'}</span></td>
+            <td style="padding: 8px;"><span style="background: #e0e0e0; padding: 2px 6px; border-radius: 4px; font-size: 0.85em;">${cat}</span></td>
             <td style="padding: 8px;">${parseFloat(gasto.valorOriginal).toFixed(2)}</td>
             <td style="padding: 8px;">${gasto.moeda}</td>
-            <td style="padding: 8px;">R$ ${parseFloat(gasto.valorBRL).toFixed(2)}</td>
+            <td style="padding: 8px;">R$ ${valorBRL.toFixed(2)}</td>
             <td style="padding: 8px;">
-                <!-- Passa a posição exata (index) do item original na memória para exclusão correta -->
                 <button type="button" onclick="excluirGasto(${index})" style="background:#dc3545; color:white; border:none; padding:4px 8px; cursor:pointer; border-radius:3px;">Excluir</button>
             </td>
         `;
         tabelaCorpo.appendChild(linha);
     });
 
-    // Sincroniza dinamicamente o valor total acumulado (baseado no filtro atual) no campo de texto de despesas
+    // Injeta os valores calculados diretamente nos blocos visuais de estatísticas na tela
+    document.getElementById("estat-alimentacao").textContent = acumuladorCategorias["Alimentação"].toFixed(2);
+    document.getElementById("estat-transporte").textContent = acumuladorCategorias["Transporte"].toFixed(2);
+    document.getElementById("estat-lazer").textContent = acumuladorCategorias["Lazer"].toFixed(2);
+    document.getElementById("estat-moradia").textContent = acumuladorCategorias["Moradia"].toFixed(2);
+    document.getElementById("estat-outros").textContent = acumuladorCategorias["Outros"].toFixed(2);
+
+    // Sincroniza dinamicamente o valor total acumulado no campo de texto principal em Reais
     document.getElementById("total").value = totalGeralBRL.toFixed(2);
 }
 
@@ -193,7 +217,7 @@ function excluirGasto(index) {
         // SALVA: Guarda a lista com o item reduzido de volta no armazenamento local do navegador
         localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos));
         
-        renderizarGastos(); // Redesenha a interface atualizando a tabela e o total da carteira
+        renderizarGastos(); // Redesenha a interface atualizando a tabela, estatísticas e totais
     }
 }
 
@@ -209,6 +233,7 @@ document.getElementById("form-gasto").addEventListener("submit", function(event)
     const valorOriginal = parseFloat(document.getElementById("valor-original").value);
     const moedaSelecionada = document.getElementById("moeda-gasto").value;
 
+    // Validação de segurança para garantir que o valor inserido é válido
     if (!Number.isFinite(valorOriginal) || valorOriginal <= 0) {
         alert("Informe um valor válido para o gasto.");
         return;
@@ -225,7 +250,7 @@ document.getElementById("form-gasto").addEventListener("submit", function(event)
         valorConvertidoBRL = valorOriginal * cotacoes.BTC;
     }
 
-    // Estrutura o objeto literal contendo as propriedades incluindo o novo campo categoria
+    // Estrutura o objeto literal contendo todas as propriedades incluindo a categoria
     const novoGasto = {
         descricao: descricao,
         categoria: categoria,
@@ -234,9 +259,15 @@ document.getElementById("form-gasto").addEventListener("submit", function(event)
         valorBRL: valorConvertidoBRL
     };
 
-    listaGastos.push(novoGasto); // Adiciona o novo gasto ao array
-    localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos)); // Persiste no localStorage
+    // SALVA: Adiciona o novo objeto na lista de memória e atualiza a chave correspondente no localStorage
+    listaGastos.push(novoGasto);
+    localStorage.setItem("gastos_carteira", JSON.stringify(listaGastos));
 
-    document.getElementById("form-gasto").reset(); // Limpa os inputs do formulário
-    renderizarGastos(); // Redesenha a tabela com o novo item adicionado
+    renderizarGastos(); // Atualiza em tempo real as tabelas e painel de estatísticas por categorias
+    document.getElementById("form-gasto").reset(); // Limpa as caixas de digitação do formulário
+    alert(`Gasto de R$ ${valorConvertidoBRL.toFixed(2)} adicionado e salvo!`);
 });
+
+// Execuções Iniciais automáticas: dispara a requisição das moedas e reconstrói o histórico do localStorage
+carregarCotacoes();
+renderizarGastos();
