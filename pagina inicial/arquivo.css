@@ -276,3 +276,16 @@ button:disabled {
         transform: translateY(0);
     }
 }
+.global-footer {
+    max-width: 610px; /* Largura idêntica aos seus cards de formulário e estatísticas */
+    width: 100%;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 40px auto 20px auto; /* O 'auto' nas laterais centraliza o bloco na página */
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+.footer-container {
+    text-align: center; /* Centraliza o conteúdo dentro do bloco */
+}
